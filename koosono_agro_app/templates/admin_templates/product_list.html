@@ -1,0 +1,154 @@
+{% extends "admin_templates/base_template.html" %}
+{% load humanize %}
+{% block main_content %}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="text-center" style="color: red; font-family: 'Georgia', serif;">Products and Purchases</h4>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-center">
+                    <thead>
+                        <tr style="">
+                            <th>Product</th>
+                            <th>Cost Price (GHS)</th>
+                            <th>Quantity in Stock</th>
+                            <th>Total Cost Price (GHS)</th>
+                            <th>Last Purchase Date</th>
+                            <th>Enter Purchases</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr id="product-row-{{ product.id }}">
+                                <td style="text-align: left;">{{ product.name }}</td>
+                                <td>{{ product.cost_price }}</td>
+                                <td id="quantity-{{ product.id }}">{{ product.quantity_in_stock }}</td>
+                                <td id="total-cost-price-{{ product.id }}">
+                                    {{ product.total_cost_price|floatformat:2|intcomma }}
+                                </td>
+                                <td id="purchase-date-{{ product.id }}">
+                                    {% if product.latest_purchase_date %}
+                                        {{ product.latest_purchase_date|date:"D. F j, Y" }}
+                                    {% else %}
+                                        No purchases yet
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-success" 
+                                            data-toggle="modal" 
+                                            data-target="#purchaseModal" 
+                                            data-product-id="{{ product.id }}" 
+                                            data-product-name="{{ product.name }}">
+                                        
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3"><strong>Overall Total Stock Price</strong></td>
+                            <td colspan="3" id="overall-total-cost-price">
+                                GHS {{ overall_total_cost_price|floatformat:2|intcomma }}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Purchase Modal -->
+<div class="modal fade" id="purchaseModal" tabindex="-1" role="dialog" aria-labelledby="purchaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="purchaseForm">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="purchaseModalLabel">Enter New Stock Quantity for <span id="product-name"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="product-id" name="product_id">
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" name="quantity" class="form-control" required min="1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Purchase</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    #overall-total-cost-price {
+        color: red;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .modal-header.bg-primary {
+        background-color: #007bff;
+        color: white;
+    }
+</style>
+{% endblock main_content %}
+{% block custom_js %}
+<script>
+    // Show the modal with product info
+    $('#purchaseModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var productId = button.data('product-id');
+        var productName = button.data('product-name');
+        
+        $('#product-id').val(productId);
+        $('#product-name').text(productName);
+    });
+
+    // Forcefully remove the backdrop and reset page dimming on modal close
+    $('#purchaseModal').on('hidden.bs.modal', function () {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+    });
+
+    // Handle form submission with AJAX
+    $('#purchaseForm').submit(function (event) {
+        event.preventDefault();
+        
+        var productId = $('#product-id').val();
+        var quantity = $('#quantity').val();
+
+        $.ajax({
+            url: '/add-purchase/' + productId + '/',
+            type: 'POST',
+            data: {
+                quantity: quantity,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (response) {
+                // Update the product row with new values
+                $('#quantity-' + response.product_id).text(response.new_quantity);
+                $('#total-cost-price-' + response.product_id).text(response.product_total_cost_price.toLocaleString());
+                $('#overall-total-cost-price').text('GHS ' + response.overall_total_cost_price.toLocaleString());
+                $('#purchase-date' + response.product_id).text(response.purchase_date);
+                // Hide the modal
+                $('#purchaseModal').modal('hide');
+            },
+            error: function () {
+                alert('Failed to update purchase. Please try again.');
+            }
+        });
+    });
+</script>
+{% endblock custom_js %}
+
+
+
+

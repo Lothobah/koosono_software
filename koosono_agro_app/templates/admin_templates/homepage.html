@@ -1,0 +1,183 @@
+{% extends "admin_templates/base_template.html" %}
+{% block title %}Enter Sales | Koosono Agro.{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid bg-light py-4">
+    <div class="card shadow-lg" id="additional-style">
+        <div class="card-header text-center bg-white">
+            <h5 id="mess" style="font-size: 14px;">
+                {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+            </h5>
+            <div id="messageArea"></div>
+            <h5 class="mb-0 text-dark"><b>Enter Sales</b></h5>
+        </div>
+
+        <div class="card-body">
+            <!-- Main Row -->
+            <div class="row">
+                <!-- Product Search and Entry (Left Side) -->
+                <div class="col-md-4 col-12 mb-3">
+                    <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search for a product...">
+                    <div id="productEntry">
+                        <!--<h5>Product Entry</h5>-->
+                        <div class="product-entry" id="selectedProductEntry"></div>
+                    </div>
+                </div>
+
+                <!-- Product Summary Table (Right Side) -->
+                <div class="col-md-8 col-12">
+                    <h5>Products Summary</h5>
+                    <table class="table table-sm table-bordered text-center" id="product-table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Selling Price</th>
+                                <th>Quantity</th>
+                                <th>Total Cost (GHS)</th>
+                                <th style="color: red;">X</th>
+                            </tr>
+                        </thead>
+                        <tbody id="selectedProducts"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3"><strong>Overall Total:</strong></td>
+                                <td colspan="2" style="color: red;"><strong id="overallTotal">GHS 0.00</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <button id="submitSales" class="btn btn-success btn-block mt-3">Submit Sales</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* General Styling */
+    .card-body, #additional-style { padding: 15px; }
+    .alert { font-size: 14px; }
+
+    /* Search Bar */
+    #searchInput { border-color: #007bff; }
+
+    /* Product Entry Section */
+    #productEntry h5 { color: #007bff; font-size: 16px; }
+
+    /* Table Styling */
+    #product-table { width: 100%; }
+    #product-table th, #product-table td { vertical-align: middle; text-align: center; }
+    .table th { background-color: #f8f9fa; color: #333; }
+    
+    /* Submit Button */
+    #submitSales { background-color: #28a745; border-color: #28a745; font-size: 16px; }
+    #submitSales:hover { background-color: #218838; }
+    #additional-style {
+      margin-left: 57px;
+    }
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        #summarySection, #productEntry { padding: 0; }
+        #product-table, #submitSales { 
+          width: 100%; 
+          margin-left: -20px;
+          margin-right: 20px;
+          
+        }
+        #additional-style {
+          width: 105%;
+          max-width: 105%;
+          margin-left: -10px;
+          margin-right: 2px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchInput');
+        const productEntry = document.getElementById('productEntry');
+        const selectedProducts = document.getElementById('selectedProducts');
+        const overallTotalDisplay = document.getElementById('overallTotal');
+        let overallTotal = 0;
+        let selectedProductsList = [];
+
+        searchInput.addEventListener('keyup', function () {
+            const query = searchInput.value.toLowerCase();
+            if (query.length > 2) {
+                fetch(`/search-product/?query=${query}`)
+                    .then(response => response.json())
+                    .then(products => {
+                        if (products.length > 0) {
+                            const product = products[0];
+                            productEntry.innerHTML = `
+                                <div class="row align-items-center">
+                                    <div class="col-md-8"><strong>${product.name}</strong> <b style="color: red">(GHS${product.selling_price})</b> - <span>Quantity in Stock: <b style="color: red;">${product.quantity_in_stock}</b></span></div>
+                                    <div class="col-md-4">
+                                        <input type="number" min="1" max="${product.stock_quantity}" id="quantityInput" class="form-control" placeholder="Qty">
+                                        <button style="width: 83px;" class="btn btn-primary btn-sm mt-1" onclick="addProduct(${product.id}, '${product.name}', ${product.selling_price}, ${product.stock_quantity})">Add</button>
+                                    </div>
+                                </div>`;
+                        } else {
+                            productEntry.innerHTML = '<div class="alert alert-warning text-center">No matching products found.</div>';
+                        }
+                    });
+            } else {
+                productEntry.innerHTML = '';
+            }
+        });
+
+        window.addProduct = function (id, name, sellingPrice, stockQuantity) {
+            const quantity = parseInt(document.getElementById('quantityInput').value);
+            if (!quantity || quantity <= 0 || quantity > stockQuantity) return;
+
+            const totalCost = quantity * sellingPrice;
+            overallTotal += totalCost;
+
+            selectedProductsList.push({ product_id: id, name, quantity, total_cost: totalCost });
+            const newRow = document.createElement('tr');
+            newRow.setAttribute('data-product-id', id);
+            newRow.innerHTML = `<td>${name}</td><td>${sellingPrice}</td><td>${quantity}</td><td>${totalCost.toFixed(2)}</td><td><button class="btn btn-sm btn-danger" onclick="removeProduct(${id}, ${totalCost})">X</button></td>`;
+            selectedProducts.appendChild(newRow);
+
+            overallTotalDisplay.textContent = 'GHS ' + overallTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            searchInput.value = '';
+            productEntry.innerHTML = '';
+        };
+
+        window.removeProduct = function (id, totalCost) {
+            const row = selectedProducts.querySelector(`[data-product-id="${id}"]`);
+            if (row) {
+                overallTotal -= totalCost;
+                row.remove();
+                selectedProductsList = selectedProductsList.filter(item => item.product_id !== id);
+                overallTotalDisplay.textContent = 'GHS ' + overallTotal.toFixed(2);
+            }
+        };
+
+        document.getElementById('submitSales').addEventListener('click', function () {
+            const salesData = { products: selectedProductsList, overall_total: overallTotal };
+            fetch('/homepage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify(salesData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    overallTotal = 0;
+                    overallTotalDisplay.textContent = 'GHS 0.00';
+                    selectedProducts.innerHTML = '';
+                    selectedProductsList = [];
+                    document.getElementById('messageArea').innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                } else {
+                    document.getElementById('messageArea').innerHTML = `<div class="alert alert-danger">Not enough stock available to complete the sale!</div>`;
+                }
+            });
+        });
+    });
+</script>
+{% endblock main_content %}

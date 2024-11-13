@@ -1,0 +1,277 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="manifest" href="manifest.json">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Login | Koosono Agrochemicals Ltd</title>
+  <meta name="description" content="Access the Great Alliance Portal - Staff Portal, Student Portal. Login with your credentials - username and password.">
+  <meta name="keywords" content="Great Alliance, Great Alliance Portal, Login, Student Portal, Admin Portal, Staff Portal">
+  <!-- google search console -->
+  <meta name="google-site-verification" content="I4LEar18uTN594j0nCsKuRRgSdN8V6LYH3c3KZtDihM" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="{% static 'kingloth/mycss/mystyle.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/img/clients/logo.jpg' %}" rel="icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- Template Main CSS File -->
+  <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Great Alliance Portal",
+    "url": "https://gaps.pythonanywhere.com",
+    "description": "Access the Great Alliance Portal - Staff Portal, Student Portal. Login with your credentials - username and password."
+  }
+  </script>
+
+  <style>
+    input.form-control {
+      text-align: left; /* Ensure text is left-aligned */
+    }
+
+    #span-id {
+        font-size: 11px;
+        margin-left: 180px;
+    }
+    #togglePassword {
+        margin-right: 23px;
+    }
+    @media (max-width: 600px) {
+        #span-id {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #togglePassword {
+            margin-right: 8px;
+        }
+    }
+    .text-center {
+      text-align: center;
+    }
+
+    .school-logo {
+      max-width: 100px;
+      margin-bottom: 15px;
+    }
+
+    .login-text {
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Container for the password input and icons */
+    .password-toggle {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Lock icon on the left */
+    .password-toggle .fa-lock {
+      position: absolute;
+      left: 10px;
+      color: #777;
+    }
+
+    /* Input field */
+    .password-toggle input {
+      width: 100%;
+      padding-left: 35px;  /* Space for lock icon */
+      padding-right: 40px; /* Space for eye icon */
+    }
+
+    /* Eye icon on the right */
+    .password-toggle .fa-eye {
+      position: absolute;
+      right: 10px;  /* Fixes the eye icon on the right side */
+      top: 50%;  /* Vertically center the eye icon */
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      color: #777;
+    }
+
+    #footer {
+      text-align: center;
+    }
+
+    /* Form Group */
+    .form-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px 12px 45px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .form-group i {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #777;
+    }
+    #togglePassword {
+        margin-left: 280px;
+    }
+    @media (max-width: 600px) {
+      .login-form {
+        margin-top: 80px;
+        width: 360px;
+        max-width: 360px;
+      }
+      input.form-control {
+          text-align: left !important;
+        }
+      #togglePassword {
+          margin-left: 310px;
+      }
+    }
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 5px;
+      margin-top: 25px;
+      cursor: pointer;
+    }
+
+    .btn-login i {
+      margin-left: 8px;
+    }
+    /* Target input fields with form-control class */
+    .form-group input.form-control {
+      text-align: left !important; /* Force left alignment for text input */
+      caret-color: auto !important; /* Keep the text cursor at the left */
+    }
+
+    /* Force the placeholder to align left */
+    .form-group input.form-control::placeholder {
+      text-align: left !important; /* Ensure the placeholder text is aligned left */
+      left: 0 !important;
+    }
+
+    /* Add mobile-specific styles */
+    @media (max-width: 600px) {
+      /* Ensure text and placeholder are aligned left on mobile */
+      .form-group input.form-control {
+        text-align: left !important; /* Force left alignment */
+      }
+      .form-group input.form-control::placeholder {
+        text-align: left !important;
+      }
+    }
+
+
+  </style>
+</head>
+
+<body>
+  <section id="" style="background: white; margin-top: 30px; text-align: left !important;">
+    <div class="container">
+      <div class="row d-flex align-items-center">
+        <div class="col-lg-6 py-5 py-lg-0 order-2 order-lg-1">
+          <img src="{% static 'images/agro.jpg' %}" class="img-fluid" alt="" style="border-radius: 10px; height: 400px; width: 420px;">
+        </div>
+        <div class="col-lg-6 order-1 order-lg-2 hero-img">
+          <div class="row mt-5">
+            <div class="col-lg-8 mt-5 mt-lg-0">
+              <form class="login-form" action="{% url 'do_login' %}" method="post" enctype="multipart/form-data" style="margin-top: 5px;">
+                {% csrf_token %}
+                <div class="text-center">
+                  <div class="logo">
+                    <!--<img src="{% static 'images/cocoa.jpg' %}" alt="School Logo" class="school-logo">-->
+                  </div>
+                  <h2 class="login-text" style="color: #213b52;">Login</h2>
+                </div>
+                {% if messages %}
+                <div class="login-error-div">
+                  {% for message in messages %}
+                  {% if message.tags == 'error' %}
+                  <div style="margin-bottom: 22px;" class="alert alert-danger">{{ message }}</div>
+                  {% endif %}
+                  {% if message.tags == 'success' %}
+                  <div style="margin-bottom: 22px;" class="alert alert-success">{{ message }}</div>
+                  {% endif %}
+                  {% endfor %}
+                </div>
+                {% endif %}
+                <div class="form-group">
+                  <i class="fas fa-user"></i>
+                  <input class="form-control" type="text" name="username" placeholder="Your Username" required style="text-align: left !important;">
+                </div>
+
+                <div class="form-group">
+                  <i class="fas fa-lock"></i>
+                  <input class="form-control" id="password" type="password" name="password" placeholder="Enter Password" required>
+                  <i class="fa fa-eye" id="togglePassword"></i>
+                </div>
+
+                  <button type="submit" class="btn btn-success btn-login">Login <i class="fas fa-sign-in-alt"></i></button>
+
+
+                <div class="login-form-group" style="margin-top: 5px; margin-bottom: 5px;">
+                  <a href="" style="color:green;">Forgot your Password?</a>
+                </div>
+
+              </form>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+  <!-- Footer -->
+  <footer id="footer" style="text-align: center;">
+    <div class="container footer-bottom clearfix" style="color: black; text-align: center;">
+      <div class="copyright">
+        <span id="span-id"><script>document.write(new Date().getFullYear());</script> &copy; Koosono Agrochemicals Ltd. Developed by KING LOTH</span>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <!-- Main JS -->
+
+  <!-- Password toggle script -->
+  <script>
+    const togglePassword = document.querySelector("#togglePassword");
+    const password = document.querySelector("#password");
+
+    togglePassword.addEventListener("click", function() {
+      const type = password.getAttribute("type") === "password" ? "text" : "password";
+      password.setAttribute("type", type);
+      this.classList.toggle("fa-eye");
+      this.classList.toggle("fa-eye-slash");
+    });
+  </script>
+</body>
+
+</html>
+
+

@@ -1,0 +1,23 @@
+{% extends "admin_templates/base_template.html" %}
+{% block title %} Pin Authentication {% endblock title %}
+{% load static %}
+{% block main_content %}
+<div class="container mt-5">
+    <div class="card">
+    <div class="card-body">
+    <h5 style="color: red;">Enter PIN to Access Page</h5>
+    <h5>
+        {% for message in messages%}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger">{{ message }}</div>
+        {% endif %}
+        {% endfor %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-danger" type="submit">Submit</button>
+    </form>
+</div>
+</div>
+</div>
+{% endblock main_content %}
